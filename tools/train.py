@@ -3,15 +3,20 @@ from PIL import Image
 
 from colpali_engine.models import ColQwen2, ColQwen2Processor
 
-model_name = "vidore/colqwen2-v0.1"
+base_model_name = (
+    "/Users/lc/Documents/ai_models/hf_models/models--vidore--colqwen2-base"
+)
+model_name = "/Users/lc/Documents/ai_models/hf_models/models--vidore--colqwen2-v1.0"
 
 model = ColQwen2.from_pretrained(
-    model_name,
+    base_model_name,
     torch_dtype=torch.bfloat16,
-    device_map="cuda:0",  # or "mps" if on Apple Silicon
+    device_map="mps",  # or "mps" if on Apple Silicon
 ).eval()
 
-processor = ColQwen2Processor.from_pretrained(model_name)
+model.load_state_dict(model_name)
+
+processor = ColQwen2Processor.from_pretrained(base_model_name)
 
 # Your inputs
 images = [
