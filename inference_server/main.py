@@ -17,19 +17,28 @@ elif torch.backends.mps.is_available():
 else:
     device_map = None
 
-# model_name = "/Users/lc/Documents/ai_models/hf_models/models--vidore--colqwen2-v1.0"
-model_name = "/Users/lc/Documents/ai_models/hf_models/models--vidore--colqwen2-base"
+base_model_name = (
+    "/Users/lc/Documents/ai_models/hf_models/models--vidore--colqwen2-base"
+)
+adapter_model_name = (
+    "/Users/lc/Documents/ai_models/hf_models/models--vidore--colqwen2-v1.0"
+)
+
 model = ColQwen2.from_pretrained(
-    model_name,
+    base_model_name,
     local_files_only=True,
     cache_dir="/Users/lc/Documents/ai_models/cache_dir",
     torch_dtype=torch.bfloat16,
     device_map=device_map,
 )
 
+# Load the adapter
+model.load_adapter(adapter_model_name)
 
 processor = ColQwen2Processor.from_pretrained(
-    model_name, local_files_only=True, cache_dir="models_hub/"
+    base_model_name,
+    local_files_only=True,
+    cache_dir="/Users/lc/Documents/ai_models/cache_dir",
 )
 
 
@@ -174,7 +183,7 @@ def handler(job: Dict[str, Any]) -> Dict[str, Any]:
     return {
         "object": "list",
         "data": embeddings,
-        "model": model_name,
+        "model": adapter_model_name,
         "usage": {
             "prompt_tokens": total_tokens,
             "total_tokens": total_tokens,
