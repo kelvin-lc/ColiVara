@@ -28,7 +28,8 @@ model = ColQwen2.from_pretrained(
     base_model_name,
     local_files_only=True,
     cache_dir="/Users/lc/Documents/ai_models/cache_dir",
-    torch_dtype=torch.bfloat16,
+    # torch_dtype=torch.bfloat16,
+    torch_dtype=torch.float16,
     device_map=device_map,
 )
 
@@ -127,6 +128,8 @@ def encode_image(input_data: List[str]) -> Tuple[List[Dict[str, Any]], int]:
     with torch.no_grad():
         image_embeddings = model(**batch_images)
 
+        torch.mps.empty_cache()  # 清理 MPS 缓存
+
     results = []
     for idx, embedding in enumerate(image_embeddings):
         embedding = embedding.to(torch.float32)
@@ -191,4 +194,8 @@ def handler(job: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-runpod.serverless.start({"handler": handler})
+runpod.serverless.start(
+    {
+        "handler": handler,
+    }
+)

@@ -20,8 +20,7 @@ from django.db.models import FloatField, Func, JSONField, Q
 from django_stubs_ext.db.models import TypedModelMeta
 from pdf2image import convert_from_bytes
 from pgvector.django import HalfVectorField
-from tenacity import (retry, retry_if_exception_type, stop_after_attempt,
-                      wait_fixed)
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 logger = logging.getLogger(__name__)
 
@@ -205,6 +204,7 @@ class Document(models.Model):
         # Constants
         EMBEDDINGS_URL = settings.EMBEDDINGS_URL
         EMBEDDINGS_BATCH_SIZE = 3
+        EMBEDDINGS_BATCH_SIZE = 1
         DELAY_BETWEEN_BATCHES = 1  # seconds
 
         # Helper function to send a batch of images to the embeddings service
@@ -257,9 +257,7 @@ class Document(models.Model):
                     raise ValidationError(
                         f"Failed to get embeddings from the embeddings service. Repsonse: {out}"
                     )
-                logger.info(
-                    f"Got embeddings for batch of {len(images)} images. delayTime: {out['delayTime']}, executionTime: {out['executionTime']}"
-                )
+                logger.info(f"Got embeddings for batch of {len(images)} images. ")
             return out["output"]["data"]
 
         base64_images = await self._prep_document(use_proxy=use_proxy)
@@ -336,7 +334,11 @@ class Document(models.Model):
         except Exception as e:
             # If there's an error, delete the document and pages
             if self.pk:
+
                 await self.adelete()  # will cascade delete the pages
+
+            # 打印错误堆栈
+            logger.error(f"222 Failed to save pages: {str(e)}")
             raise ValidationError(f"Failed to save pages: {str(e)}")
 
         return
