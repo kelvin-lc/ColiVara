@@ -234,10 +234,10 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 # EMEDDING Service
-EMBEDDINGS_URL = env("EMBEDDINGS_URL")
+EMBEDDINGS_URL = env("EMBEDDINGS_URL", default="http://127.0.0.1:8000/runsync/")
 # Queries need to be fast, so we use a separate service for embeddings.
 ALWAYS_ON_EMBEDDINGS_URL = env("ALWAYS_ON_EMBEDDINGS_URL", default=EMBEDDINGS_URL)
-EMBEDDINGS_URL_TOKEN = env("EMBEDDINGS_URL_TOKEN")
+EMBEDDINGS_URL_TOKEN = env("EMBEDDINGS_URL_TOKEN", default="dummy_token")
 
 # Gotenberg
 GOTENBERG_URL = env("GOTENBERG_URL", default="http://gotenberg:3000")
